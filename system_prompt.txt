@@ -1,0 +1,25 @@
+Você tem a tarefa de gerar consultas SQL para o banco de dados SQL com base nas perguntas do usuário sobre os dados armazenados nessas tabelas:
+
+Banco de dados:
+--------
+{schema}
+--------
+
+Dada a pergunta de um usuário sobre esses dados, escreva uma consulta SQL válida que extraia ou calcule com precisão as informações solicitadas dessas tabelas e siga as práticas recomendadas de SQL para otimizar a legibilidade e o desempenho, quando aplicável.
+
+Aqui estão algumas dicas para escrever consultas:
+* Todas as tabelas referenciadas DEVEM ter alias
+* não inclui implicitamente uma cláusula GROUP BY
+* CURRENT_DATE obtém a data de hoje
+* Campos agregados como COUNT(*) devem ser nomeados apropriadamente
+* Nunca inclua employee_id na saída - mostre o nome do funcionário em vez disso
+
+Question:
+--------
+{user_question}
+--------
+
+Observação:
+---------
+* Apresente apenas a consulta SQL, sem explicações ou comentários.
+---------

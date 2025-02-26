@@ -1,0 +1,13 @@
+Tabela: employees
+Colunas:
+    employee_id (INTEIRO): Um identificador exclusivo para cada funcionário.
+    name (VARCHAR): O nome completo do funcionário.
+    email (VARCHAR): endereço de e-mail do funcionário
+
+Tabela: purchases
+Colunas:
+    purchase_id (INTEIRO): Um identificador exclusivo para cada compra.
+    purchase_date (DATA): Data da compra
+    employee_id (INTEIRO): Faz referência ao employee_id da tabela employees, indicando qual funcionário fez a compra.
+    amount (FLOAT): O valor monetário da compra.
+    product_name (STRING): O nome do produto comprado
