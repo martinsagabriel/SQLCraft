@@ -26,12 +26,7 @@ pip install -r requirements.txt
 
 ### Basic Conversion
 ```bash
-python main.py "Show users who joined this year"
-```
-
-### With Schema File
-```bash
-python main.py "Find products with price over $100" --schema database_schema.txt
+python main.py --prompt prompt.txt --schema schema.txt --question "Show users who joined this year"
 ```
 
 ### Example Output
@@ -47,7 +42,6 @@ ORDER BY price DESC;
 1. Create `.env` file:
 ```ini
 GROQ_API_KEY=your_api_key_here
-DEFAULT_DB_SCHEMA=schemas/schema.txt
 ```
 
 2. Schema file format (`schemas/primary.txt`):
@@ -58,6 +52,8 @@ Columns:
     name (VARCHAR): The full name of the employee.
     email (VARCHAR): employee's email address
 ```
+
+
 <!-- 
 ## Advanced Features 🔧
 
