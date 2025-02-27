@@ -1,8 +1,4 @@
 import streamlit as st
-import os
-from groq import Groq
-import sqlparse
-from dotenv import load_dotenv
 import mysql.connector
 import psycopg2
 import sqlite3
