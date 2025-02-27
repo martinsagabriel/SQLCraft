@@ -2,16 +2,15 @@ import os
 from groq import Groq
 import sqlparse
 from dotenv import load_dotenv
+import argparse
 
 load_dotenv('.env')
 
 MODEL = "llama3-70b-8192"
 
-with open('system_prompt.txt', 'r') as file:
-  BASE_PROMPT = file.read()
-
-with open('schema.txt', 'r') as file:
-  BASE_SCHEMA = file.read()
+def load_file(file_path: str) -> str:
+    with open(file_path, 'r') as file:
+        return file.read()
 
 client = Groq(
   api_key=os.getenv('GROQ_API_KEY')
@@ -26,7 +25,7 @@ def generate_sql(client, prompt, model):
             "content": prompt
         }
     ]
-    )
+  )
 
   return completion.choices[0].message.content
 
@@ -34,8 +33,17 @@ def format_sql(raw_sql: str) -> str:
     return sqlparse.format(raw_sql, reindent=True, keyword_case='upper')
 
 if __name__ == "__main__":
-    full_prompt = BASE_PROMPT.format(user_question="Liste os produtos mais vendidos em 2024", schema=BASE_SCHEMA)
-    print(full_prompt)
-    
-    response = generate_sql(client, full_prompt, MODEL)
-    print(format_sql(response))
+  parser = argparse.ArgumentParser(description='Gerador de SQL usando IA')
+  parser.add_argument('--prompt', required=True, help='Caminho para o arquivo de prompt do sistema')
+  parser.add_argument('--schema', required=True, help='Caminho para o arquivo de schema')
+  parser.add_argument('--question', required=True, help='Pergunta do usuário')
+  
+  args = parser.parse_args()
+  
+  BASE_PROMPT = load_file(args.prompt)
+  BASE_SCHEMA = load_file(args.schema)
+  
+  full_prompt = BASE_PROMPT.format(user_question=args.question, schema=BASE_SCHEMA)
+      
+  response = generate_sql(client, full_prompt, MODEL)
+  print(format_sql(response))

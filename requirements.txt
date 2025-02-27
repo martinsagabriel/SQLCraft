@@ -1,3 +1,5 @@
 python-dotenv
 sqlparse
 groq
+argparse
+streamlit
