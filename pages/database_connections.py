@@ -1,8 +1,4 @@
 import streamlit as st
-import os
-from groq import Groq
-import sqlparse
-from dotenv import load_dotenv
 import mysql.connector
 import psycopg2
 import sqlite3
@@ -10,6 +6,13 @@ import pyodbc
 import pandas as pd
 import json
 from pathlib import Path
+
+# Page configuration
+st.set_page_config(
+    page_title="Database Select - SQLCraft",
+    page_icon="🔌",
+    layout="wide"
+)
 
 # Create connections directory if it doesn't exist
 CONNECTIONS_DIR = Path("connections")
@@ -43,32 +46,12 @@ def connect_database(db_type, params):
                 f"UID={params['user']};"
                 f"PWD={params['password']}"
             )
-        print(connection)
         return connection
     except Exception as e:
         st.error(f"Error connecting to database: {str(e)}")
         return None
 
-def execute_query(connection, query):
-    print(query)
-    try:
-        cursor = connection.cursor()
-        cursor.execute(query)
-        results = cursor.fetchall()
-        print(results)
-        columns = [desc[0] for desc in cursor.description]
-        print(columns)
-        cursor.close()
-        results_list = [list(row) for row in results]
-        df = pd.DataFrame(results_list)
-        df.columns = columns
-        return df
-    except Exception as e:
-        st.error(f"Error executing query: {str(e)}")
-        return None, None
-    
 def save_connection(name, db_type, params):
-    """Save connection parameters to a JSON file"""
     connection_data = {
         "name": name,
         "type": db_type,
@@ -81,7 +64,6 @@ def save_connection(name, db_type, params):
     return True
 
 def load_saved_connections():
-    """Load all saved connections"""
     connections = {}
     for file_path in CONNECTIONS_DIR.glob("*.json"):
         with open(file_path, 'r') as f:
@@ -90,22 +72,33 @@ def load_saved_connections():
     return connections
 
 def delete_connection(name):
-    """Delete a saved connection"""
     file_path = CONNECTIONS_DIR / f"{name}.json"
     if file_path.exists():
         file_path.unlink()
         return True
     return False
 
-st.subheader("Your SELECT")
-# User question field
-user_question = st.text_area("Query", height=150)
+def execute_query(connection, query):
+    try:
+        cursor = connection.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+        cursor.close()
+        results_list = [list(row) for row in results]
+        df = pd.DataFrame(results_list)
+        df.columns = columns
+        return df
+    except Exception as e:
+        st.error(f"Error executing query: {str(e)}")
+        return None, None
 
-# Database Connection Section
-st.sidebar.title("Database Connection")
+# Page title
+st.title("🔌 Database Select")
+st.markdown("---")
 
 # Add tabs for New Connection and Saved Connections
-connection_tab, saved_connections_tab = st.sidebar.tabs(["New Connection", "Saved Connections"])
+connection_tab, saved_connections_tab = st.tabs(["New Connection", "Saved Connections"])
 
 with connection_tab:
     db_type = st.selectbox(
@@ -129,7 +122,6 @@ with connection_tab:
     col1, col2 = st.columns(2)
     
     with col1:
-        # Connect button
         if st.button("Connect"):
             if db_type == "SQLite":
                 connection_params = {"database": database}
@@ -147,7 +139,6 @@ with connection_tab:
                 st.success("Connected successfully!")
                 st.session_state['db_connection'] = connection
                 
-                # Save connection if name is provided
                 if connection_name:
                     save_connection(connection_name, db_type, connection_params)
                     st.success(f"Connection '{connection_name}' saved!")
@@ -168,7 +159,6 @@ with saved_connections_tab:
         if selected_connection:
             conn_data = saved_connections[selected_connection]
             
-            # Display connection details
             st.write("Connection Details:")
             details = {
                 "Type": conn_data["type"],
@@ -177,7 +167,7 @@ with saved_connections_tab:
                 "Port": conn_data["params"].get("port", "")
             }
             for key, value in details.items():
-                if value:  # Only show non-empty values
+                if value:
                     st.text(f"{key}: {value}")
             
             col1, col2 = st.columns(2)
@@ -198,9 +188,20 @@ with saved_connections_tab:
                 if st.button("Delete Connection"):
                     if delete_connection(selected_connection):
                         st.success(f"Connection '{selected_connection}' deleted!")
-                        st.experimental_rerun()
                     else:
                         st.error("Failed to delete connection!")
+
+# Display current connection status
+st.markdown("---")
+if 'db_connection' in st.session_state:
+    st.success("✅ Currently connected to database")
+else:
+    st.warning("❌ No active database connection") 
+    
+    
+st.subheader("Your SELECT")
+# User question field
+user_question = st.text_area("Query", height=150)
 
 if 'db_connection' in st.session_state:
     if st.button("Execute SQL"):
