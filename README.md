@@ -53,6 +53,11 @@ Columns:
     email (VARCHAR): employee's email address
 ```
 
+## WEB UI 🖥️
+```bash	
+streamlit run app.py
+```
+=======
 
 <!-- 
 ## Advanced Features 🔧

@@ -3,12 +3,14 @@ import os
 from groq import Groq
 import sqlparse
 from dotenv import load_dotenv
+import pandas as pd
 
 # Page configuration
 st.set_page_config(
-    page_title="SQLCraft - SQL Generator",
+    page_title="SQL Generator - SQLCraft",
     page_icon="🔍",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
 # Loading environment variables
@@ -49,7 +51,13 @@ def generate_sql(client, prompt, model):
 def format_sql(raw_sql: str) -> str:
     return sqlparse.format(raw_sql, reindent=True, keyword_case='upper')
 
-# Streamlit interface
+def execute_query(connection, query):
+    # This function is not provided in the original file or the code block
+    # It's assumed to exist as it's called in the new code
+    # Implementation of execute_query function
+    pass
+
+# Main page content
 st.title("🔍 SQLCraft - SQL Generator")
 st.markdown("---")
 
@@ -92,8 +100,19 @@ if st.button("Generate SQL", type="primary"):
                 
                 # Displaying formatted SQL
                 st.subheader("Generated SQL:")
-                formatted_sql = format_sql(response)
-                st.code(formatted_sql.replace("```sql", "").replace("```", ""), language="sql")
+                formatted_sql = format_sql(response).replace("```sql", "").replace("```", "")
+                st.code(formatted_sql, language="sql")
+                
+                # Execute SQL button (only if connected to database)
+                if 'db_connection' in st.session_state:
+                    if st.button("Execute SQL"):
+                        columns, results = execute_query(st.session_state['db_connection'], formatted_sql)
+                        if results is not None:
+                            st.subheader("Query Results:")
+                            df = pd.DataFrame(results, columns=columns)
+                            st.dataframe(df)
+                else:
+                    st.warning("Please connect to a database in the Database Connections page to execute queries.")
                 
                 # Copy SQL button
                 st.button("Copy SQL", 

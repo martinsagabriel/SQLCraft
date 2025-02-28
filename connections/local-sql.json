@@ -1,0 +1,11 @@
+{
+    "name": "local-sql",
+    "type": "SQL Server",
+    "params": {
+        "host": "localhost",
+        "port": "1433",
+        "database": "master",
+        "user": "SA",
+        "password": "Str0ngPa$$w0rd"
+    }
+}
