@@ -42,7 +42,6 @@ ORDER BY price DESC;
 1. Create `.env` file:
 ```ini
 GROQ_API_KEY=your_api_key_here
-DEFAULT_DB_SCHEMA=schemas/schema.txt
 ```
 
 2. Schema file format (`schemas/primary.txt`):
@@ -58,6 +57,7 @@ Columns:
 ```bash	
 streamlit run app.py
 ```
+=======
 
 <!-- 
 ## Advanced Features 🔧
