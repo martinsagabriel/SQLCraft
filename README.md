@@ -26,12 +26,7 @@ pip install -r requirements.txt
 
 ### Basic Conversion
 ```bash
-python main.py "Show users who joined this year"
-```
-
-### With Schema File
-```bash
-python main.py "Find products with price over $100" --schema database_schema.txt
+python main.py --prompt prompt.txt --schema schema.txt --question "Show users who joined this year"
 ```
 
 ### Example Output
@@ -58,6 +53,12 @@ Columns:
     name (VARCHAR): The full name of the employee.
     email (VARCHAR): employee's email address
 ```
+
+## WEB UI 🖥️
+```bash	
+streamlit run app.py
+```
+
 <!-- 
 ## Advanced Features 🔧
 

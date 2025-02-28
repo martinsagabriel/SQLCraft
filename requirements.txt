@@ -3,3 +3,10 @@ sqlparse
 groq
 argparse
 streamlit
+mysql
+psycopg2
+sqlite3
+pyodbc
+pandas
+json
+pathlib
