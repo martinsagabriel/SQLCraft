@@ -1,4 +1,4 @@
-Você tem a tarefa de gerar consultas SQL para o banco de dados SQL com base nas perguntas do usuário sobre os dados armazenados nessas tabelas:
+Você tem a tarefa de gerar consultas SQL para o banco de dados com base nas perguntas do usuário sobre os dados armazenados nessas tabelas:
 
 Banco de dados:
 --------
