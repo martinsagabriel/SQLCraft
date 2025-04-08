@@ -2,6 +2,7 @@ import streamlit as st
 import sqlparse
 import requests
 from typing import List
+import os
 
 def get_local_models() -> List[str]:
     try:
@@ -13,6 +14,15 @@ def get_local_models() -> List[str]:
     except:
         return []
 
+def load_prompt_template() -> str:
+    prompt_path = os.path.join('prompts', 'system_prompt.txt')
+    try:
+        with open(prompt_path, 'r', encoding='utf-8') as file:
+            return file.read()
+    except FileNotFoundError:
+        st.error(f"Arquivo de prompt não encontrado em: {prompt_path}")
+        return ""
+
 # Page configuration
 st.set_page_config(
     page_title="SQLCraft",
@@ -22,31 +32,7 @@ st.set_page_config(
 )
 
 # Prompt template global
-PROMPT_TEMPLATE = """Você tem a tarefa de gerar consultas SQL para o banco de dados com base nas perguntas do usuário sobre os dados armazenados nessas tabelas:
-
-Banco de dados:
---------
-{schema}
---------
-
-Dada a pergunta de um usuário sobre esses dados, escreva uma consulta SQL válida que extraia ou calcule com precisão as informações solicitadas dessas tabelas e siga as práticas recomendadas de SQL para otimizar a legibilidade e o desempenho, quando aplicável.
-
-Aqui estão algumas dicas para escrever consultas:
-* Todas as tabelas referenciadas DEVEM ter alias
-* não inclui implicitamente uma cláusula GROUP BY
-* CURRENT_DATE obtém a data de hoje
-* Campos agregados como COUNT(*) devem ser nomeados apropriadamente
-* Nunca inclua employee_id na saída - mostre o nome do funcionário em vez disso
-
-Question:
---------
-{user_question}
---------
-
-Observação:
----------
-* Apresente apenas a consulta SQL, sem explicações ou comentários.
----------"""
+PROMPT_TEMPLATE = load_prompt_template()
 
 # Sidebar com seleção de modelo
 st.sidebar.title("Configurações")
