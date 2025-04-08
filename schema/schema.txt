@@ -1,13 +1,61 @@
-Tabela: employees
+Tabela: Loja
+    Armazena informações sobre as unidades da loja.
 Colunas:
-    employee_id (INTEIRO): Um identificador exclusivo para cada funcionário.
-    name (VARCHAR): O nome completo do funcionário.
-    email (VARCHAR): endereço de e-mail do funcionário
-
-Tabela: purchases
+id_loja (INTEIRO): Identificador único para cada loja (Chave Primária).
+nome (VARCHAR): Nome da loja.
+endereco (VARCHAR): Endereço físico da loja.
+cidade (VARCHAR): Cidade onde a loja está localizada.
+estado (VARCHAR): Sigla do estado da loja (ex: SP, RJ).
+cep (VARCHAR): Código de Endereçamento Postal (CEP) da loja.
+telefone (VARCHAR): Número de telefone de contato da loja.
+Tabela: Vendedor
+    Armazena informações sobre os funcionários que realizam vendas.
 Colunas:
-    purchase_id (INTEIRO): Um identificador exclusivo para cada compra.
-    purchase_date (DATA): Data da compra
-    employee_id (INTEIRO): Faz referência ao employee_id da tabela employees, indicando qual funcionário fez a compra.
-    amount (FLOAT): O valor monetário da compra.
-    product_name (STRING): O nome do produto comprado
+id_vendedor (INTEIRO): Identificador único para cada vendedor (Chave Primária).
+id_loja (INTEIRO): Faz referência ao id_loja da tabela Loja, indicando em qual loja o vendedor trabalha (Chave Estrangeira).
+nome (VARCHAR): Nome completo do vendedor.
+cpf (VARCHAR): CPF do vendedor (único).
+email (VARCHAR): Endereço de e-mail do vendedor (único).
+telefone (VARCHAR): Número de telefone de contato do vendedor.
+percentual_comissao (DECIMAL): Percentual de comissão do vendedor sobre as vendas.
+Tabela: Produto
+    Armazena informações sobre os itens disponíveis para venda.
+Colunas:
+id_produto (INTEIRO): Identificador único para cada produto (Chave Primária).
+codigo_sku (VARCHAR): Código de barras ou SKU (Stock Keeping Unit) do produto (único).
+nome (VARCHAR): Nome do produto.
+descricao (TEXTO LONGO/VARCHAR MAX): Descrição detalhada do produto.
+preco_unitario (DECIMAL): Preço de venda unitário atual do produto.
+categoria (VARCHAR): Categoria à qual o produto pertence.
+unidade_medida (VARCHAR): Unidade de medida do produto (ex: 'un', 'kg', 'lt').
+Tabela: Clientes
+    Armazena informações sobre os clientes que realizam compras.
+Colunas:
+id_cliente (INTEIRO): Identificador único para cada cliente (Chave Primária).
+nome (VARCHAR): Nome completo ou Razão Social do cliente.
+cpf_cnpj (VARCHAR): CPF ou CNPJ do cliente (único).
+email (VARCHAR): Endereço de e-mail do cliente (único).
+telefone (VARCHAR): Número de telefone de contato do cliente.
+endereco (VARCHAR): Endereço do cliente.
+cidade (VARCHAR): Cidade do cliente.
+estado (VARCHAR): Sigla do estado do cliente.
+cep (VARCHAR): CEP do cliente.
+data_cadastro (DATA): Data em que o cliente foi cadastrado no sistema.
+Tabela: Vendas
+    Registra cada transação de venda realizada (cabeçalho da venda).
+Colunas:
+id_venda (INTEIRO): Identificador único para cada transação de venda (Chave Primária).
+id_cliente (INTEIRO): Faz referência ao id_cliente da tabela Clientes, indicando qual cliente realizou a compra (Chave Estrangeira).
+id_vendedor (INTEIRO): Faz referência ao id_vendedor da tabela Vendedor, indicando qual vendedor efetuou a venda (Chave Estrangeira).
+id_loja (INTEIRO): Faz referência ao id_loja da tabela Loja, indicando em qual loja a venda ocorreu (Chave Estrangeira).
+data_hora_venda (DATA/HORA): Data e hora exatas em que a venda foi realizada.
+valor_total (DECIMAL): Valor monetário total da venda (soma dos itens).
+forma_pagamento (VARCHAR): Método utilizado para o pagamento (ex: 'Cartão Crédito', 'Dinheiro', 'PIX').
+status_venda (VARCHAR): Status atual da venda (ex: 'Concluída', 'Cancelada', 'Pendente').
+Tabela: ItensVenda
+    Detalha os produtos específicos incluídos em cada venda (itens da venda). Esta tabela conecta Vendas e Produto.
+Colunas:
+id_venda (INTEIRO): Faz referência ao id_venda da tabela Vendas, indicando a qual venda este item pertence (Parte da Chave Primária Composta, Chave Estrangeira).
+id_produto (INTEIRO): Faz referência ao id_produto da tabela Produto, indicando qual produto foi vendido neste item (Parte da Chave Primária Composta, Chave Estrangeira).
+quantidade (DECIMAL/INTEIRO): Quantidade do produto vendido neste item.
+preco_unitario_venda (DECIMAL): Preço unitário do produto no momento exato da venda (pode diferir do preço atual na tabela Produto).

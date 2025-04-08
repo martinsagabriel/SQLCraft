@@ -1,32 +1,78 @@
-CREATE TABLE employees (
-    employee_id INT PRIMARY KEY IDENTITY(1,1),
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL
+CREATE TABLE Loja (
+    id_loja INT IDENTITY(1,1) PRIMARY KEY, 
+    nome VARCHAR(100) NOT NULL,
+    endereco VARCHAR(255),
+    cidade VARCHAR(100),
+    estado VARCHAR(2),
+    cep VARCHAR(9),   
+    telefone VARCHAR(20)
 );
-CREATE TABLE purchases (
-    purchase_id INT PRIMARY KEY IDENTITY(1,1),
-    purchase_date DATE NOT NULL,
-    employee_id INT NOT NULL,
-    amount FLOAT NOT NULL,
-    product_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+GO
+
+CREATE TABLE Produto (
+    id_produto INT IDENTITY(1,1) PRIMARY KEY,
+    codigo_sku VARCHAR(50) UNIQUE,
+    nome VARCHAR(150) NOT NULL,
+    descricao VARCHAR(MAX),       
+    preco_unitario DECIMAL(10, 2) NOT NULL CHECK (preco_unitario >= 0),
+    categoria VARCHAR(50),
+    unidade_medida VARCHAR(10)    
 );
+GO
 
-INSERT INTO employees (name, email) VALUES
-('João Silva', 'joao.silva@example.com'),
-('Maria Oliveira', 'maria.oliveira@example.com'),
-('Carlos Pereira', 'carlos.pereira@example.com'),
-('Ana Santos', 'ana.santos@example.com'),
-('Pedro Costa', 'pedro.costa@example.com');
+CREATE TABLE Clientes (
+    id_cliente INT IDENTITY(1,1) PRIMARY KEY,
+    nome VARCHAR(200) NOT NULL,
+    cpf_cnpj VARCHAR(18) UNIQUE,
+    email VARCHAR(100) UNIQUE,
+    telefone VARCHAR(20),
+    endereco VARCHAR(255),
+    cidade VARCHAR(100),
+    estado VARCHAR(2),
+    cep VARCHAR(9),
+    data_cadastro DATE DEFAULT GETDATE()
+);
+GO
 
-INSERT INTO purchases (purchase_date, employee_id, amount, product_name) VALUES
-('2024-01-05', 1, 120.50, 'Monitor 24"'),
-('2024-01-12', 2, 75.25, 'Mouse sem fio'),
-('2024-01-18', 3, 349.99, 'Notebook Acer'),
-('2024-02-03', 4, 29.99, 'Teclado USB'),
-('2024-02-15', 5, 180.00, 'Impressora laser'),
-('2024-02-20', 1, 55.50, 'Cadeira gamer'),
-('2024-03-01', 2, 300.00, 'Smartphone Samsung'),
-('2024-03-07', 3, 79.99, 'Headset gamer'),
-('2024-03-14', 4, 150.00, 'Fone de ouvido Bluetooth'),
-('2024-03-28', 5, 299.99, 'Tablet Lenovo');
+CREATE TABLE Vendedor (
+    id_vendedor INT IDENTITY(1,1) PRIMARY KEY,
+    id_loja INT NOT NULL,         
+    nome VARCHAR(150) NOT NULL,
+    cpf VARCHAR(14) UNIQUE,       
+    email VARCHAR(100) UNIQUE,    
+    telefone VARCHAR(20),
+    percentual_comissao DECIMAL(5, 2) DEFAULT 0.00 CHECK (percentual_comissao >= 0),
+    CONSTRAINT FK_Vendedor_Loja FOREIGN KEY (id_loja) REFERENCES Loja(id_loja)
+    
+    
+);
+GO
+
+CREATE TABLE Vendas (
+    id_venda INT IDENTITY(1,1) PRIMARY KEY,
+    id_cliente INT NOT NULL,      
+    id_vendedor INT NOT NULL,     
+    id_loja INT NOT NULL,         
+    data_hora_venda DATETIME2 DEFAULT GETDATE(),
+    valor_total DECIMAL(12, 2) NOT NULL CHECK (valor_total >= 0),
+    forma_pagamento VARCHAR(50),
+    status_venda VARCHAR(30) DEFAULT 'Concluída',
+    CONSTRAINT FK_Vendas_Clientes FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
+    CONSTRAINT FK_Vendas_Vendedor FOREIGN KEY (id_vendedor) REFERENCES Vendedor(id_vendedor),
+    CONSTRAINT FK_Vendas_Loja FOREIGN KEY (id_loja) REFERENCES Loja(id_loja)
+);
+GO
+
+CREATE TABLE ItensVenda (
+    id_venda INT NOT NULL,        
+    id_produto INT NOT NULL,      
+    quantidade DECIMAL(10, 3) NOT NULL CHECK (quantidade > 0),
+    preco_unitario_venda DECIMAL(10, 2) NOT NULL CHECK (preco_unitario_venda >= 0),
+    CONSTRAINT PK_ItensVenda PRIMARY KEY (id_venda, id_produto),
+    CONSTRAINT FK_ItensVenda_Vendas FOREIGN KEY (id_venda)
+        REFERENCES Vendas(id_venda)
+        ON DELETE CASCADE,
+    CONSTRAINT FK_ItensVenda_Produto FOREIGN KEY (id_produto)
+        REFERENCES Produto(id_produto)
+);
+GO

@@ -69,24 +69,59 @@ def format_sql(raw_sql: str) -> str:
     return sqlparse.format(raw_sql, reindent=True, keyword_case='upper')
 
 # Main page content
-st.title("🔍 SQLCraft - SQL Generator")
+st.title("SQLCraft")
 st.markdown("---")
 
-# Two-column layout
-col1, col2 = st.columns(2)
+# File upload at the top
+st.subheader("Schema Configuration")
+schema_file = st.file_uploader("Upload your database schema file", type=['txt', 'sql'])
 
-with col1:
-    st.subheader("Configuration Files")
-    schema_file = st.file_uploader("Upload schema file", type=['txt', 'sql'])
+# Adding some space
+st.markdown("---")
 
-with col2:
-    st.subheader("Your Question")
-    user_question = st.text_area("Type your question in natural language", height=150)
+# Chat-like conversation area
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
 
-# Generate SQL button
-if st.button("Generate SQL", type="primary"):
+# Display previous messages
+for message in st.session_state.messages:
+    with st.container():
+        if message['type'] == 'user':
+            st.markdown(f"**Question:** {message['content']}")
+        else:
+            st.markdown("**Generated SQL:**")
+            st.code(message['content'], language="sql")
+        st.markdown("---")
+
+# Bottom input area with custom styling
+st.markdown(
+    """
+    <style>
+    .stTextArea textarea {
+        border-radius: 10px;
+    }
+    .stButton button {
+        border-radius: 20px;
+        padding: 0.5rem 2rem;
+    }
+    div.block-container {
+        padding-bottom: 5rem;
+    }
+    </style>
+    """, 
+    unsafe_allow_html=True
+)
+
+# Input area at the bottom
+with st.container():
+    user_question = st.text_area("Type your question here", height=100, placeholder="Ask a question about your database...")
+    col1, col2 = st.columns([4, 1])
+    with col2:
+        generate_button = st.button("Generate SQL", type="primary", use_container_width=True)
+
+if generate_button:
     if not selected_model:
-        st.warning("Por favor, selecione um modelo na barra lateral para continuar.")
+        st.warning("Please select a model in the sidebar to continue.")
     elif schema_file and user_question:
         # Reading schema file
         schema_content = schema_file.getvalue().decode()
@@ -102,19 +137,18 @@ if st.button("Generate SQL", type="primary"):
             response = generate_sql(full_prompt, selected_model)
             
             if response:
-                st.success("SQL gerado com sucesso!")
-                
-                # Displaying formatted SQL
-                st.subheader("SQL Gerado:")
                 formatted_sql = format_sql(response).replace("```sql", "").replace("```", "")
-                st.code(formatted_sql, language="sql")
                 
-                # Copy SQL button
-                st.button("Copiar SQL", 
-                         on_click=lambda: st.write(formatted_sql))
-    else:
-        st.warning("Por favor, forneça o arquivo de esquema e uma pergunta.")
+                # Add messages to chat history
+                st.session_state.messages.append({'type': 'user', 'content': user_question})
+                st.session_state.messages.append({'type': 'assistant', 'content': formatted_sql})
+                
+                # Force rerun to update chat
+                st.experimental_rerun()
 
 # Footer
 st.markdown("---")
-st.markdown("Developed by Gabriel Martins")
+st.markdown(
+    "<div style='text-align: center; color: gray;'>Developed by Gabriel Martins</div>", 
+    unsafe_allow_html=True
+)
